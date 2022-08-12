@@ -39,8 +39,7 @@ namespace blendermania_dotnet
 
             // TODO place blocks
 
-            map.MapName = "Mod_" + map.MapName;
-            await map.SaveAsync("C:/Users/Vladimir/Documents/Trackmania/Maps/Debuger/TestMapMM.Map.Gbx");
+            await map.SaveAsync(MapPath);
         }
     }
 }

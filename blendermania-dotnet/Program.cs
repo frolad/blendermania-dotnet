@@ -1,92 +1,66 @@
-﻿//// See https://aka.ms/new-console-template for more information
-//Console.WriteLine("Hello, World!");
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using blendermania_dotnet;
-using GBX.NET;
+﻿using GBX.NET;
+using GBX.NET.LZO;
 using GBX.NET.Engines.Game;
+using blendermania_dotnet;
+using System.Text.Json;
 
+// run to debug:
+// dotnet run -- <command> <payload>
 
-//var user = GameBox.ParseNode<CGamePlayerProfile>("niklas.Profile.Gbx");
-//Console.WriteLine(user.OnlineLogin);
+// run to publish:
+// dotnet publish -r win-x64 -p:PublishSingleFile=true --self-contained false -c Release
 
-if (string.IsNullOrEmpty(args.ElementAtOrDefault(0)))
+// run to start
+// blendermania-dotnet.exe <command> <string json payload>
+// commands: "place-objects-on-map"
+
+// PAYLOAD example for "place-objects-on-map"
+/*
 {
-    throw new Exception("Json string expected as first and only argument");
+    "Path": "C:/Users/Vladimir/Documents/Trackmania/Maps/Debuger/TestMap.Map.Gbx",
+    "Items": [
+        {
+            "Name": "TestItem.Item.Gbx",
+            "Path": "C:/Users/Vladimir/Documents/Trackmania/Items/TestItem.Item.Gbx",
+            "Position": {"X": 0,"Y": 0,"Z": 0},
+            "Rotation": {"X": 0,"Y": 0,"Z": 0},
+            "Pivot": {"X": 0,"Y": 0,"Z": 0}
+        }
+    ]
+}
+*/
+
+GBX.NET.Lzo.SetLzo(typeof(GBX.NET.LZO.MiniLZO));
+
+var command = args.ElementAtOrDefault(0);
+if (string.IsNullOrEmpty(command))
+{
+    throw new Exception("Command is not provided");
 }
 
+var payload = args.ElementAtOrDefault(1);
+if (string.IsNullOrEmpty(payload))
+{
+    throw new Exception("Payload is not provided");
+}
+
+// move bellow to separate file?
 var options = new JsonSerializerOptions
 {
     PropertyNameCaseInsensitive = true
 };
 
-var data = JsonSerializer.Deserialize<MapObjects>(args[0], options);
-
-if (string.IsNullOrEmpty(data?.MapName))
-    throw new Exception("Map name is null");
-
-if (data.Blocks is null || data.Blocks.Count == 0)
-    throw new Exception("Blocks are 0 or null");
-
-var map = GameBox.ParseNode<CGameCtnChallenge>(data.MapName);
-
-
-foreach (var block in data.Blocks)
+switch (command)
 {
-    var newBlockIdent = new Ident(Id: block.Name!, Collection: "Stadium", Author: "skyslide");
-    var newBlockDirection = Direction.West;
-    var newBlockCoords = new Int3(block.Pos[0], block.Pos[1], block.Pos[2]);
+    case "place-objects-on-map":
+        var body = JsonSerializer.Deserialize<PlaceObjectsOnMap>(System.Text.RegularExpressions.Regex.Unescape(payload), options);
+        if (body is null)
+        {
+            throw new Exception("Invalid json");
+        }
+        await body.Exec();
+        break;
 
-    var newBlock = new CGameCtnBlock(
-                        blockModel: newBlockIdent,
-                        direction: newBlockDirection,
-                        coord: newBlockCoords,
-                        flags: 0);
-
-    map.Blocks.Add(newBlock);
-
-
+    default:
+        throw new Exception("No such command: " + command);
 }
-
-await map.SaveAsync("edited_" + data.MapName);
-
-
-
-
-
-
-
-
-
-
-//return 0;
-//foreach (var block in map.Blocks ?? new List<CGameCtnBlock>() )
-//{
-//    Console.WriteLine(block.Name);
-//}
-
-
-//foreach (var item in map.AnchoredObjects ?? new List<CGameCtnAnchoredObject>() )
-//{
-
-//    if (item.ItemModel.Id.Contains("venus"))
-//    {
-//        item.AbsolutePositionInMap =
-//            item.AbsolutePositionInMap with { Y = item.AbsolutePositionInMap.Y + 1024 };
-
-//    }
-
-//}
-
-//await map.SaveAsync("modified-items-z.Map.Gbx");
-
-//Console.WriteLine(map.DayDuration);
-//Console.WriteLine(map.DayTime);
-//Console.WriteLine(map.DynamicDaylight);
-
-//foreach (string arg in args)
-//{
-//    Console.WriteLine(arg);
-//}
-
-//return 0;

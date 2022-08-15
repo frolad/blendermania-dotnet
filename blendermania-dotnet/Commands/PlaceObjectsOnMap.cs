@@ -37,7 +37,11 @@ namespace blendermania_dotnet
                 map = item.AddItemToMap(map);
             }
 
-            // TODO place blocks
+            // palce items
+            foreach (var block in Blocks)
+            {
+                map = block.AddBlockToMap(map);
+            }
 
             await map.SaveAsync(MapPath);
         }

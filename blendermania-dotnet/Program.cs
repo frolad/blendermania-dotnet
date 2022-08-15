@@ -50,17 +50,23 @@ var options = new JsonSerializerOptions
     PropertyNameCaseInsensitive = true
 };
 
-switch (command)
+try
 {
-    case "place-objects-on-map":
-        var body = JsonSerializer.Deserialize<PlaceObjectsOnMap>(System.Text.RegularExpressions.Regex.Unescape(payload), options);
-        if (body is null)
-        {
-            throw new Exception("Invalid json");
-        }
-        await body.Exec();
-        break;
+    switch (command)
+    {
+        case "place-objects-on-map":
+            var map = JsonSerializer.Deserialize<PlaceObjectsOnMap>(System.Text.RegularExpressions.Regex.Unescape(payload), options);
+            if (map is null) { throw new Exception("Invalid json"); }
+            await map.Exec();
+            break;
 
-    default:
-        throw new Exception("No such command: " + command);
+        default:
+            throw new Exception("No such command: " + command);
+    }
+
+    Console.Write("");
+}
+catch (System.Exception err)
+{
+    Console.Write(err.Message);
 }

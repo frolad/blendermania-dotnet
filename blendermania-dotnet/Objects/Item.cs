@@ -18,10 +18,13 @@ namespace blendermania_dotnet
                 throw new Exception("Null Path or Name or Position");
             }
 
-            // first embed item into map
-            Map.ImportFileToEmbed(Path, Name);
+            // embed only if it's not embedded already
+            if (Map.EmbeddedObjects is null || !Map.EmbeddedObjects.ContainsKey(Name))
+            {
+                Map.ImportFileToEmbed(Path, "Items");
+            }
 
-            // then add achor to the item
+            // add anchor to the item
             var item = Map.PlaceAnchoredObject(
                 new Ident(Name.Replace("Items/", "").Replace("/", @"\"), new Id(26), "Blendermania"),
                 Position.ToGBXNetVec3(),
@@ -43,6 +46,27 @@ namespace blendermania_dotnet
             Map.RemoveChunk(0x03043069);
 
             return Map;
+        }
+
+        public CGameCtnMacroBlockInfo AddItemToMacroblock(CGameCtnMacroBlockInfo Macro)
+        {
+            if (Path is null || Name is null)
+            {
+                throw new Exception("Null Path or Name or Position");
+            }
+
+            if (Macro.ObjectSpawns is not null)
+            {
+                var obj = new CGameCtnMacroBlockInfo.ObjectSpawn();
+                obj.ItemModel = new Ident(Name.Replace("Items/", "").Replace("/", @"\"), new Id(26), "Blendermania");
+                obj.AbsolutePositionInMap = Position.ToGBXNetVec3();
+                obj.PitchYawRoll = Rotation.ToGBXNetVec3();
+                obj.PivotPosition = Pivot.ToGBXNetVec3();
+
+                Macro.ObjectSpawns.Add(obj);
+            }
+
+            return Macro;
         }
     }
 }

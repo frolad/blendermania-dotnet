@@ -5,9 +5,17 @@ namespace blendermania_dotnet
 {
     public class Block
     {
-        public CGameCtnChallenge AddBlocksToMap(CGameCtnChallenge Map)
+        public string? Name { get; set; }
+        public Int3 Position { get; set; } = new Int3();
+        public Direction Dir { get; set; } = Direction.North;
+        public CGameCtnChallenge AddBlockToMap(CGameCtnChallenge Map)
         {
-            // TODO
+            if (Name is null)
+            {
+                throw new Exception("Null block Name");
+            }
+
+            Map.PlaceBlock(new Ident(Name), Position, Dir);
             return Map;
         }
     }

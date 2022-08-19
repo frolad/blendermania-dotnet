@@ -7,8 +7,11 @@ namespace blendermania_dotnet
     {
         public string? MapPath { get; set; }
         public List<Item> Items { get; set; } = new List<Item>();
-        // TODO
         public List<Block> Blocks { get; set; } = new List<Block>();
+        public bool ShouldOverwrite { get; set; } = false;
+        public string MapSuffix { get; set; } = "_modified";
+        public bool CleanBlocks { get; set; } = true;
+        public bool CleanItems { get; set; } = true;
 
         async public Task Exec()
         {
@@ -20,15 +23,26 @@ namespace blendermania_dotnet
             // parse map
             var map = GameBox.ParseNode<CGameCtnChallenge>(MapPath);
 
-            // clean up
-            if (map.EmbeddedObjects is not null)
+            // clean up existed data
+            if (CleanBlocks) // DOESN'T WORK ATM IN GBX.NET
             {
-                map.EmbeddedObjects.Clear();
+                if (Blocks.Count > 0 && map.Blocks is not null)
+                {
+                    //map.Blocks.Clear();
+                }
             }
 
-            if (map.AnchoredObjects is not null)
+            if (CleanItems)
             {
-                map.AnchoredObjects.Clear();
+                if (map.EmbeddedObjects is not null)
+                {
+                    map.EmbeddedObjects.Clear();
+                }
+
+                if (map.AnchoredObjects is not null)
+                {
+                    map.AnchoredObjects.Clear();
+                }
             }
 
             // palce items
@@ -37,13 +51,44 @@ namespace blendermania_dotnet
                 map = item.AddItemToMap(map);
             }
 
-            // palce items
-            foreach (var block in Blocks)
+            // palce blocks
+            foreach (var block in Blocks) // VERY UNSTABLE
             {
-                map = block.AddBlockToMap(map);
+                //map = block.AddBlockToMap(map);
             }
 
-            await map.SaveAsync(MapPath);
+            // save modified map
+            var NewPath = MapPath;
+            if (!ShouldOverwrite)
+            {
+                if (MapSuffix.Trim().Count() == 0)
+                {
+                    MapSuffix = "_modified";
+                }
+
+                map.MapName += MapSuffix;
+
+                // change file name
+                var dir = Path.GetDirectoryName(NewPath);
+                var fn = Path.GetFileNameWithoutExtension(NewPath);
+                var ext = Path.GetExtension(NewPath);
+                if (fn.ToLower().Contains(".map"))
+                {
+                    fn = Path.GetFileNameWithoutExtension(fn) + MapSuffix + ".Map";
+                }
+                else
+                {
+                    fn = fn + MapSuffix;
+                }
+
+                if (dir is null)
+                {
+                    dir = "";
+                }
+                NewPath = Path.Combine(dir, fn + ext);
+            }
+
+            await map.SaveAsync(NewPath);
         }
     }
 }

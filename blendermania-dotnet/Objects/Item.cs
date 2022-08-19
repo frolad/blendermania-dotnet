@@ -19,7 +19,7 @@ namespace blendermania_dotnet
             }
 
             // embed only if it's not embedded already
-            if (Map.EmbeddedObjects is null || !Map.EmbeddedObjects.ContainsKey(Name))
+            if (Path.Length > 0 && (Map.EmbeddedObjects is null || !Map.EmbeddedObjects.ContainsKey(Name)))
             {
                 Map.ImportFileToEmbed(Path, "Items");
             }

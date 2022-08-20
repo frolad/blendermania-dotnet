@@ -15,7 +15,7 @@ namespace blendermania_dotnet
         {
             if (Path is null || Name is null)
             {
-                throw new Exception("Null Path or Name or Position");
+                throw new Exception("Null Path or Name");
             }
 
             // embed only if it's not embedded already

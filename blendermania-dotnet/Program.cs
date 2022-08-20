@@ -38,11 +38,13 @@ if (string.IsNullOrEmpty(command))
     throw new Exception("Command is not provided");
 }
 
-var payload = args.ElementAtOrDefault(1);
-if (string.IsNullOrEmpty(payload))
+var payloadPath = args.ElementAtOrDefault(1);
+if (string.IsNullOrEmpty(payloadPath))
 {
-    throw new Exception("Payload is not provided");
+    throw new Exception("Payload path is not provided");
 }
+
+var payload = File.ReadAllText(payloadPath);
 
 // move bellow to separate file?
 var options = new JsonSerializerOptions
@@ -55,7 +57,7 @@ try
     switch (command)
     {
         case "place-objects-on-map":
-            var map = JsonSerializer.Deserialize<PlaceObjectsOnMap>(System.Text.RegularExpressions.Regex.Unescape(payload), options);
+            var map = JsonSerializer.Deserialize<PlaceObjectsOnMap>(payload, options);
             if (map is null) { throw new Exception("Invalid json"); }
             await map.Exec();
             break;

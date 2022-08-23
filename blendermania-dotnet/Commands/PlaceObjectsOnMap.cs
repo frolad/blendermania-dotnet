@@ -12,6 +12,7 @@ namespace blendermania_dotnet
         public string MapSuffix { get; set; } = "_modified";
         public bool CleanBlocks { get; set; } = true;
         public bool CleanItems { get; set; } = true;
+        public string Env { get; set; } = "Stadium";
 
         async public Task Exec()
         {
@@ -48,7 +49,7 @@ namespace blendermania_dotnet
             // palce items
             foreach (var item in Items)
             {
-                map = item.AddItemToMap(map);
+                map = item.AddItemToMap(map, Env);
             }
 
             // palce blocks

@@ -42,9 +42,6 @@ namespace blendermania_dotnet
                 Pivot.ToGBXNetVec3()
             );
 
-            // GBX.net workaround, wait for fix to remove
-            Map.RemoveChunk(0x03043069);
-
             return Map;
         }
 

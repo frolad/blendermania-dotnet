@@ -8,7 +8,7 @@ using System.Text.Json;
 // dotnet run -- <command> <payload>
 
 // run to publish:
-// dotnet publish -r win-x64 -p:PublishSingleFile=true --self-contained false -c Release
+// dotnet publish -r win-x64 -p:PublishSingleFile=true --self-contained true -c Release
 
 // run to start
 // blendermania-dotnet.exe <command> <string json payload>
@@ -60,15 +60,21 @@ try
             var map = JsonSerializer.Deserialize<PlaceObjectsOnMap>(payload, options);
             if (map is null) { throw new Exception("Invalid json"); }
             await map.Exec();
+            Console.Write($"SUCCESS");
+            break;
+
+        case "convert-item-to-obj":
+            var item = JsonSerializer.Deserialize<ConvertItemToObj>(payload, options);
+            if (item is null) { throw new Exception("Invalid json"); }
+            var outputFile = item.Exec();
+            Console.Write($"SUCCESS: {outputFile}");
             break;
 
         default:
             throw new Exception("No such command: " + command);
     }
-
-    Console.Write("");
 }
 catch (System.Exception err)
 {
-    Console.Write(err.Message);
+    Console.Write($"ERROR: {err.Message}");
 }

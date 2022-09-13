@@ -38,13 +38,12 @@ if (string.IsNullOrEmpty(command))
     throw new Exception("Command is not provided");
 }
 
-var payloadPath = args.ElementAtOrDefault(1);
-if (string.IsNullOrEmpty(payloadPath))
+var oayload = args.ElementAtOrDefault(1);
+if (string.IsNullOrEmpty(oayload))
 {
     throw new Exception("Payload path is not provided");
 }
 
-var payload = File.ReadAllText(payloadPath);
 
 // move bellow to separate file?
 var options = new JsonSerializerOptions
@@ -52,22 +51,46 @@ var options = new JsonSerializerOptions
     PropertyNameCaseInsensitive = true
 };
 
+
 try
 {
+    
     switch (command)
     {
         case "place-objects-on-map":
-            var map = JsonSerializer.Deserialize<PlaceObjectsOnMap>(payload, options);
-            if (map is null) { throw new Exception("Invalid json"); }
-            await map.Exec();
-            Console.Write($"SUCCESS");
+            {
+                var json = File.ReadAllText(oayload);
+                var map = JsonSerializer.Deserialize<PlaceObjectsOnMap>(json, options);
+                if (map is null) { throw new Exception("Invalid json"); }
+                await map.Exec();
+                Console.Write($"SUCCESS");
+            }
             break;
 
         case "convert-item-to-obj":
-            var item = JsonSerializer.Deserialize<ConvertItemToObj>(payload, options);
-            if (item is null) { throw new Exception("Invalid json"); }
-            var outputFile = item.Exec();
-            Console.Write($"SUCCESS: {outputFile}");
+            {
+                var json = File.ReadAllText(oayload);
+                var item = JsonSerializer.Deserialize<ConvertItemToObj>(json, options);
+                if (item is null) { throw new Exception("Invalid json"); }
+                var outputFile = item.Exec();
+                Console.Write($"SUCCESS: {outputFile}");
+            }
+            break;
+
+        case "place-mediatracker-clip-on-map":
+            {
+                var json = File.ReadAllText(oayload);
+                var map = JsonSerializer.Deserialize<PlaceMediaTrackerClipOnMap>(json, options);
+                if (map is null) { throw new Exception("Invalid json"); }
+                await map.Exec();
+                Console.Write($"SUCCESS");
+            }
+            break;
+        
+        case "get-mediatracker-clips":
+            var mtData = new MediaTrackerClipsData(MapPath: oayload);
+            var jsonPath = mtData.WriteJsonFileGetPath();
+            Console.Write(jsonPath);
             break;
 
         default:
@@ -77,4 +100,6 @@ try
 catch (System.Exception err)
 {
     Console.Write($"ERROR: {err.Message}");
+
+    //throw;
 }

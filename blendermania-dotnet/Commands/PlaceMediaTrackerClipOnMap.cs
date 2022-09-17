@@ -62,19 +62,10 @@ namespace blendermania_dotnet
     class PlaceMediaTrackerClipOnMap
     {
         public string? MapPath { get; set; }
-        public List<MediaTrackerClip> MTClips { get; set; } = new();
-        public List<Item> Items { get; set; } = new List<Item>();
-        public List<Block> Blocks { get; set; } = new List<Block>();
-        public bool ShouldOverwrite { get; set; } = false;
-        public string MapSuffix { get; set; } = "_modified";
-        public bool CleanBlocks { get; set; } = true;
-        public bool CleanItems { get; set; } = true;
-        public string Env { get; set; } = "Stadium";
+        public List<MediaTrackerClip> Clips { get; set; } = new();
 
         async public Task Exec()
         {
-            throw new NotImplementedException();
-
             if (MapPath is null || MapPath.Length == 0)
             {
                 throw new Exception("Map file path is null or empty");
@@ -83,58 +74,48 @@ namespace blendermania_dotnet
             // parse map
             var map = GameBox.ParseNode<CGameCtnChallenge>(MapPath);
 
-            var clips = map.ClipGroupInGame?.Clips;
+            var map_clips = map.ClipGroupInGame?.Clips;
 
-            if (clips is null)
+            if (map_clips is null)
                 return;
 
-            foreach (var clip in clips)
+
+            foreach (var clip in Clips)
             {
+                CGameCtnMediaClipGroup.ClipTrigger? map_clip= null;
+
+                foreach(var mclip in map_clips)
+                {
+                    if (mclip.Clip.Name == clip.Name)
+                    {
+                        map_clip = mclip;
+                        break;
+                    }
+                }
+                
+                if (map_clip is null)
+                    continue;
+
                 var newCoords = new List<Int3>();
 
-                foreach(var coord in clip.Trigger.Coords)
+                foreach (var pos in clip.Positions)
                 {
-                    newCoords.Add(new Int3 {
-                        X = coord.X + 3,
-                        Y = coord.Y + 128,
-                        Z = coord.Z + 0
+                    newCoords.Add(new Int3
+                    {
+                        X = pos.X,
+                        Y = pos.Y,
+                        Z = pos.Z
                     });
                 }
 
                 var coordsArray = newCoords.ToArray();
 
-                clip.Trigger.Coords = coordsArray;
+                map_clip.Trigger.Coords = coordsArray;
             }
 
+            // TODO new map prefix?
             var NewPath = MapPath;
-            if (!ShouldOverwrite)
-            {
-                if (MapSuffix.Trim().Count() == 0)
-                {
-                    MapSuffix = "_modified";
-                }
 
-                map.MapName += MapSuffix;
-
-                // change file name
-                var dir = Path.GetDirectoryName(NewPath);
-                var fn = Path.GetFileNameWithoutExtension(NewPath);
-                var ext = Path.GetExtension(NewPath);
-                if (fn.ToLower().Contains(".map"))
-                {
-                    fn = Path.GetFileNameWithoutExtension(fn) + MapSuffix + ".Map";
-                }
-                else
-                {
-                    fn = fn + MapSuffix;
-                }
-
-                if (dir is null)
-                {
-                    dir = "";
-                }
-                NewPath = Path.Combine(dir, fn + ext);
-            }
             await map.SaveAsync(NewPath);
 
         }

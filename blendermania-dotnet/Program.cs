@@ -38,8 +38,8 @@ if (string.IsNullOrEmpty(command))
     throw new Exception("Command is not provided");
 }
 
-var oayload = args.ElementAtOrDefault(1);
-if (string.IsNullOrEmpty(oayload))
+var payload = args.ElementAtOrDefault(1);
+if (string.IsNullOrEmpty(payload))
 {
     throw new Exception("Payload path is not provided");
 }
@@ -59,7 +59,7 @@ try
     {
         case "place-objects-on-map":
             {
-                var json = File.ReadAllText(oayload);
+                var json = File.ReadAllText(payload);
                 var map = JsonSerializer.Deserialize<PlaceObjectsOnMap>(json, options);
                 if (map is null) { throw new Exception("Invalid json"); }
                 await map.Exec();
@@ -69,7 +69,7 @@ try
 
         case "convert-item-to-obj":
             {
-                var json = File.ReadAllText(oayload);
+                var json = File.ReadAllText(payload);
                 var item = JsonSerializer.Deserialize<ConvertItemToObj>(json, options);
                 if (item is null) { throw new Exception("Invalid json"); }
                 var outputFile = item.Exec();
@@ -77,9 +77,9 @@ try
             }
             break;
 
-        case "place-mediatracker-clip-on-map":
+        case "place-mediatracker-clips-on-map":
             {
-                var json = File.ReadAllText(oayload);
+                var json = File.ReadAllText(payload);
                 var map = JsonSerializer.Deserialize<PlaceMediaTrackerClipOnMap>(json, options);
                 if (map is null) { throw new Exception("Invalid json"); }
                 await map.Exec();
@@ -88,7 +88,7 @@ try
             break;
         
         case "get-mediatracker-clips":
-            var mtData = new MediaTrackerClipsData(MapPath: oayload);
+            var mtData = new MediaTrackerClipsData(MapPath: payload);
             var jsonPath = mtData.WriteJsonFileGetPath();
             Console.Write(jsonPath);
             break;

@@ -1,8 +1,7 @@
 {
   "profiles": {
     "blendermania-dotnet": {
-      "commandName": "Project",
-      "commandLineArgs": "place-mediatracker-clip-on-map \"A:\\ManiaPlanet\\Docs\\Maps\\My Maps\\map-export.json\""
+      "commandName": "Project"
     },
     "get mt data": {
       "commandName": "Project",

@@ -6,7 +6,7 @@ namespace blendermania_dotnet
     public class MediaTrackerClip
     {
         public string? Name { get; set; }
-        public Vector3 Position { get; set; } = new Vector3();
+        public List<Int3> Positions { get; set; } = new();
 
     }
 }

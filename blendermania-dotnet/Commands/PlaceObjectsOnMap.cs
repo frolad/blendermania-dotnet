@@ -35,9 +35,9 @@ namespace blendermania_dotnet
 
             if (CleanItems)
             {
-                if (map.EmbeddedObjects is not null)
+                if (map.EmbeddedData is not null)
                 {
-                    map.EmbeddedObjects.Clear();
+                    map.EmbeddedData.Clear();
                 }
 
                 if (map.AnchoredObjects is not null)

@@ -35,6 +35,13 @@ namespace blendermania_dotnet
                 throw new Exception("No item geometry in the file");
             }
 
+            string OutputFile = Path.Join(OutputDir, $"{Path.GetFileNameWithoutExtension(ItemPath)}.obj");
+            using (FileStream fs = File.Create(OutputFile))
+            {
+                item.ItemModel.MeshCrystal.ExportToObj(fs, new MemoryStream(), leaveOpen: false);
+            }
+
+            /*
             using var objWriterStream = new MemoryStream();
 
             item.ItemModel.MeshCrystal.ExportToObj(objWriterStream, new MemoryStream());
@@ -53,6 +60,7 @@ namespace blendermania_dotnet
             string OutputFile = Path.Join(OutputDir, $"{Path.GetFileNameWithoutExtension(ItemPath)}.obj");
 
             File.WriteAllBytes(OutputFile, objStream.ToArray());
+            */
 
             return OutputFile;
         }

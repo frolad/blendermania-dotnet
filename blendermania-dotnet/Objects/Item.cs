@@ -19,18 +19,20 @@ namespace blendermania_dotnet
             }
 
             // embed only if it's not embedded already
-            if (Path.Length > 0 && (Map.EmbeddedObjects is null || !Map.EmbeddedObjects.ContainsKey(Name)))
+            if (Path.Length > 0 && (Map.EmbeddedData is null || !Map.EmbeddedData.ContainsKey(Name)))
             {
                 Map.ImportFileToEmbed(Path, "Items");
             }
 
-            if (Name.ToLower().StartsWith("items") || Name.ToLower().StartsWith("blocks")) {
+            if (Name.ToLower().StartsWith("items") || Name.ToLower().StartsWith("blocks"))
+            {
                 var parts = Name.Split("/");
                 Name = String.Join("/", parts.Skip(1).Take(parts.Length).ToArray());
             }
 
             var id = new Id(Env);
-            if (Env == "Stadium2020") {
+            if (Env == "Stadium2020")
+            {
                 id = new Id(26);
             }
 

@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GBX.NET" Version="1.1.0" />
+    <PackageReference Include="GBX.NET" Version="1.1.1" />
     <PackageReference Include="GBX.NET.Imaging" Version="1.1.1" />
     <PackageReference Include="GBX.NET.Json" Version="0.1.6" />
     <PackageReference Include="GBX.NET.LZO" Version="1.0.2" />

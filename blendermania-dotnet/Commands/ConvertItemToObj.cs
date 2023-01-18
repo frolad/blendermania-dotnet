@@ -32,7 +32,7 @@ namespace blendermania_dotnet
 
             if (item.ItemModel is null)
             {
-                throw new Exception("No item geometry in the file");
+                throw new Exception("No item geometry in the file or unsuported item type");
             }
 
             string OutputFile = Path.Join(OutputDir, $"{Path.GetFileNameWithoutExtension(ItemPath)}.obj");

@@ -54,7 +54,7 @@ var options = new JsonSerializerOptions
 
 try
 {
-    
+
     switch (command)
     {
         case "place-objects-on-map":
@@ -86,11 +86,21 @@ try
                 Console.Write($"SUCCESS");
             }
             break;
-        
+
         case "get-mediatracker-clips":
             var mtData = new MediaTrackerClipsData(MapPath: payload);
             var jsonPath = mtData.WriteJsonFileGetPath();
             Console.Write(jsonPath);
+            break;
+
+        case "replace-item-image":
+            {
+                var json = File.ReadAllText(payload);
+                var map = JsonSerializer.Deserialize<ReplaceItemImage>(json, options);
+                if (map is null) { throw new Exception("Invalid json"); }
+                await map.Exec();
+                Console.Write($"SUCCESS");
+            }
             break;
 
         default:

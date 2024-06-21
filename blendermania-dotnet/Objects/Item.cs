@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using GBX.NET;
 using GBX.NET.Engines.Game;
 using static GBX.NET.Engines.Game.CGameCtnAnchoredObject;
@@ -11,7 +12,15 @@ namespace blendermania_dotnet
         public Vector3 Position { get; set; } = new Vector3();
         public Vector3 Rotation { get; set; } = new Vector3();
         public Vector3 Pivot { get; set; } = new Vector3();
+
+        [JsonConverter(typeof(EPhaseOffsetConverter))]
         public EPhaseOffset? AnimPhaseOffset { get; set; }
+
+        [JsonConverter(typeof(DifficultyColorConverter))]
+        public DifficultyColor? DifficultyColor { get; set; }
+
+        [JsonConverter(typeof(LightmapQualityConverter))]
+        public LightmapQuality? LightmapQuality { get; set; }
 
         public CGameCtnChallenge AddItemToMap(CGameCtnChallenge Map, string Env)
         {
@@ -48,6 +57,8 @@ namespace blendermania_dotnet
 
 
             item.AnimPhaseOffset = AnimPhaseOffset;
+            item.Color = DifficultyColor;
+            item.LightmapQuality = LightmapQuality;
 
             return Map;
         }

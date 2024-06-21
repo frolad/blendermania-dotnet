@@ -111,5 +111,5 @@ catch (System.Exception err)
 {
     Console.Write($"ERROR: {err.Message}");
 
-    //throw;
+    throw;
 }

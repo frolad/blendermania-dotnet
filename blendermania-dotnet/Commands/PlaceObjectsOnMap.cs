@@ -22,7 +22,7 @@ namespace blendermania_dotnet
             }
 
             // parse map
-            var map = GameBox.ParseNode<CGameCtnChallenge>(MapPath);
+            var map = Gbx.ParseNode<CGameCtnChallenge>(MapPath);
 
             // clean up existed data
             if (CleanBlocks) // DOESN'T WORK ATM IN GBX.NET
@@ -35,10 +35,7 @@ namespace blendermania_dotnet
 
             if (CleanItems)
             {
-                if (map.EmbeddedData is not null)
-                {
-                    map.EmbeddedData.Clear();
-                }
+                map.EmbeddedZipData = [];
 
                 if (map.AnchoredObjects is not null)
                 {
@@ -89,7 +86,7 @@ namespace blendermania_dotnet
                 NewPath = Path.Combine(dir, fn + ext);
             }
 
-            await map.SaveAsync(NewPath);
+            map.Save(NewPath);
         }
     }
 }

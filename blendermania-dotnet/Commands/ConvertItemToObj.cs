@@ -18,9 +18,9 @@ namespace blendermania_dotnet
             CGameItemModel item;
             try
             {
-                item = GameBox.ParseNode<CGameItemModel>(ItemPath);
+                item = Gbx.ParseNode<CGameItemModel>(ItemPath);
             }
-            catch (System.Exception)
+            catch
             {
                 throw new Exception("This type of item can not be converted");
             }

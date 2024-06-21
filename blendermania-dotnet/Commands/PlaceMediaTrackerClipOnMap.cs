@@ -26,31 +26,33 @@ namespace blendermania_dotnet
 
         public string WriteJsonFileGetPath()
         {
-            var map      = GameBox.ParseNode<CGameCtnChallenge>(MapPath);
-            var clips    = map.ClipGroupInGame?.Clips;
+            var map = Gbx.ParseNode<CGameCtnChallenge>(MapPath);
+            var clips = map.ClipGroupInGame?.Clips;
             var jsonPath = MapPath + ".MediatrackerData.json";
 
             List<InGameMediaTrackerClips> igClips = new();
 
             if (clips is not null)
-            foreach (var clip in clips)
-            {
-                var igClip = new InGameMediaTrackerClips();
-                    igClip.ClipName = clip.Clip.Name;
-
-                foreach (var coord in clip.Trigger.Coords)
+                foreach (var clip in clips)
                 {
-                    igClip.Triggers.Add(new Int3
+                    var igClip = new InGameMediaTrackerClips
                     {
-                        X = coord.X,
-                        Y = coord.Y,
-                        Z = coord.Z
-                    });
+                        ClipName = clip.Clip.Name
+                    };
+
+                    foreach (var coord in clip.Trigger.Coords ?? [])
+                    {
+                        igClip.Triggers.Add(new Int3
+                        {
+                            X = coord.X,
+                            Y = coord.Y,
+                            Z = coord.Z
+                        });
+                    }
+                    igClips.Add(igClip);
                 }
-                igClips.Add(igClip);
-            }
             else
-                igClips.Add(new() { ClipName = "None found"});
+                igClips.Add(new() { ClipName = "None found" });
 
             var data = JsonSerializer.Serialize(igClips);
 
@@ -72,7 +74,7 @@ namespace blendermania_dotnet
             }
 
             // parse map
-            var map = GameBox.ParseNode<CGameCtnChallenge>(MapPath);
+            var map = Gbx.ParseNode<CGameCtnChallenge>(MapPath);
 
             var map_clips = map.ClipGroupInGame?.Clips;
 
@@ -82,9 +84,9 @@ namespace blendermania_dotnet
 
             foreach (var clip in Clips)
             {
-                CGameCtnMediaClipGroup.ClipTrigger? map_clip= null;
+                CGameCtnMediaClipGroup.ClipTrigger? map_clip = null;
 
-                foreach(var mclip in map_clips)
+                foreach (var mclip in map_clips)
                 {
                     if (mclip.Clip.Name == clip.Name)
                     {
@@ -92,7 +94,7 @@ namespace blendermania_dotnet
                         break;
                     }
                 }
-                
+
                 if (map_clip is null)
                     continue;
 
@@ -110,13 +112,13 @@ namespace blendermania_dotnet
 
                 var coordsArray = newCoords.ToArray();
 
-                map_clip.Trigger.Coords = coordsArray;
+                map_clip.Value.Trigger.Coords = coordsArray;
             }
 
             // TODO new map prefix?
             var NewPath = MapPath;
 
-            await map.SaveAsync(NewPath);
+            map.Save(NewPath);
 
         }
 

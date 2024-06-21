@@ -6,8 +6,14 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
+using GBXColor = GBX.NET.Color;
+using SysColor = System.Drawing.Color;
+
+using System.Runtime.Versioning;
+
 namespace blendermania_dotnet
 {
+    [SupportedOSPlatform("windows")]
     class ReplaceItemImage
     {
         public string ItemPath { get; set; } = "";
@@ -28,15 +34,20 @@ namespace blendermania_dotnet
                 throw new Exception("Only .tga image supported");
             }
 
-            var item = GameBox.ParseNodeHeader<CGameItemModel>(ItemPath, readRawBody: true);
+            var item = Gbx.ParseHeaderNode<CGameItemModel>(ItemPath, new());
+            if (item is null)
+            {
+                throw new Exception("Item not found");
+            }
+
             var bitmap = TgaToBitmap(ImagePath);
             var resized = new Bitmap(bitmap, new Size(64, 64));
             var colors = BitMapToColor(resized);
 
-            item.Icon = colors;
+            item.Icon = colors.ConvertToGBXColor();
             item.IconWebP = null;
 
-            await item.SaveAsync();
+            item.Save(ItemPath);
         }
 
         public Bitmap TgaToBitmap(string Path)
@@ -58,15 +69,15 @@ namespace blendermania_dotnet
             return new Bitmap(tga.Width, tga.Height, tga.Stride, format, data);
         }
 
-        public Color[,] BitMapToColor(Bitmap bm)
+        public SysColor[,] BitMapToColor(Bitmap bm)
         {
-            var colors = new Color[bm.Width, bm.Height];
+            var colors = new SysColor[bm.Width, bm.Height];
             for (int i = 0; i < bm.Height; i++)
             {
                 for (int j = 0; j < bm.Width; j++)
                 {
                     var mediacolor = bm.GetPixel(i, j);
-                    var drawingcolor = Color.FromArgb(mediacolor.A, mediacolor.R, mediacolor.G, mediacolor.B);
+                    var drawingcolor = SysColor.FromArgb(mediacolor.A, mediacolor.R, mediacolor.G, mediacolor.B);
                     colors[i, j] = drawingcolor;
                 }
             }

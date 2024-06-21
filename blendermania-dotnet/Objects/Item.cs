@@ -1,5 +1,6 @@
 using GBX.NET;
 using GBX.NET.Engines.Game;
+using static GBX.NET.Engines.Game.CGameCtnAnchoredObject;
 
 namespace blendermania_dotnet
 {
@@ -10,6 +11,7 @@ namespace blendermania_dotnet
         public Vector3 Position { get; set; } = new Vector3();
         public Vector3 Rotation { get; set; } = new Vector3();
         public Vector3 Pivot { get; set; } = new Vector3();
+        public EPhaseOffset? AnimPhaseOffset { get; set; }
 
         public CGameCtnChallenge AddItemToMap(CGameCtnChallenge Map, string Env)
         {
@@ -43,6 +45,9 @@ namespace blendermania_dotnet
                 Rotation.ToGBXNetVec3(),
                 Pivot.ToGBXNetVec3()
             );
+
+
+            item.AnimPhaseOffset = AnimPhaseOffset;
 
             return Map;
         }

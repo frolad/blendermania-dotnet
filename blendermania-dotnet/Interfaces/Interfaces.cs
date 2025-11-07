@@ -1,7 +1,6 @@
-public interface IBMCommand
+public interface ICommand
 {
     public const string COMMAND_NAME = "base-command";
 
-    public static Task Execute(string payload) => Task.CompletedTask;
-
+    public static Task<int> Execute(string payload) => Task.FromResult(0);
 }

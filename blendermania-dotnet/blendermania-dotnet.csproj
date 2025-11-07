@@ -6,7 +6,7 @@
     <RootNamespace>blendermania_dotnet</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PublishTrimmed>true</PublishTrimmed>
+    <!-- <PublishTrimmed>true</PublishTrimmed> -->
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 

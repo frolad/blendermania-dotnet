@@ -6,14 +6,13 @@ using System.Text.Json;
 using GBX.NET.Exceptions;
 
 // run to debug:
-// dotnet run -- <command> <payload>
+// dotnet run -- <command> <jsonpayloadpath>
 
 // run to publish:
 // dotnet publish -r win-x64 -p:PublishSingleFile=true --self-contained true -c Release
 
 // run to start
-// blendermania-dotnet.exe <command> <string json payload>
-// commands: "place-objects-on-map"
+// blendermania-dotnet.exe <command> <jsonpayloadpath>
 
 // PAYLOAD example for "place-objects-on-map"
 /*
@@ -31,20 +30,23 @@ using GBX.NET.Exceptions;
 }
 */
 
-// GBX.NET.Lzo.SetLzo(typeof(GBX.NET.LZO.MiniLZO));
+Gbx.LZO = new Lzo();
+
 try
 {
 
     var command = args.ElementAtOrDefault(0);
     if (string.IsNullOrEmpty(command))
     {
-        throw new Exception("Command is not provided");
+        Console.WriteLine("Command is not provided");
+        return (int)ExitCodes.InvalidPayload;
     }
 
     var payload = args.ElementAtOrDefault(1);
     if (string.IsNullOrEmpty(payload))
     {
-        throw new Exception("Payload path is not provided");
+        Console.WriteLine("Payload path is not provided");
+        return (int)ExitCodes.InvalidPayload;
     }
 
 
@@ -53,31 +55,17 @@ try
     switch (command)
     {
         case PlaceObjectsOnMap.COMMAND_NAME:
-            await PlaceObjectsOnMap.Execute(payload);
-            break;
+            return await PlaceObjectsOnMap.Execute(payload);
 
         default:
             throw new Exception("No such command: " + command);
     }
-
-    return (int)ExitCodes.Success;
 }
 
 
 catch (Exception err)
 {
-    Console.WriteLine("ERROR:");
-    Console.WriteLine(err.ToString());
-    
-    switch(err)
-    {
-        case NotAGbxException:
-            return (int)ExitCodes.NotAGbx;
+    Console.WriteLine("Error: " + err.Message);
+    return (int)ExitCodes.UnknownError;
 
-        case ArgumentNullException:
-            return (int)ExitCodes.ValueIsNull;
-
-        default:
-            return (int)ExitCodes.UnknownError;
-    }
 }

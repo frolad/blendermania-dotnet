@@ -9,6 +9,4 @@ public static class Constants
         PropertyNameCaseInsensitive = true
     };
 
-
-    public const string PLACE_OBJECTS_ON_MAP_COMMAND = "place-objects-on-map";
 }

@@ -1,7 +1,7 @@
 
 namespace blendermania_dotnet;
 
-public class BMMap
+public class Map
 {
     public string MapPath { get; set; } = "";
     public List<Item> Items { get; set; } = [];

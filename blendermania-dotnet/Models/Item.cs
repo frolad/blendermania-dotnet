@@ -29,11 +29,14 @@ namespace blendermania_dotnet
                 throw new Exception("Null Path or Name");
             }
 
-            if (Name.ToLower().StartsWith("items") || Name.ToLower().StartsWith("blocks"))
+
+            if (Name.Contains("/Items/"))
             {
-                var parts = Name.Split("/");
-                Name = String.Join("/", parts.Skip(1).Take(parts.Length).ToArray());
+                var parts = Name.Split("/Items/");
+                Name = string.Join("/", parts.Skip(1).Take(parts.Length).ToArray());
             }
+
+            Console.WriteLine($"Placing item: {Name} at {Position.X}, {Position.Y}, {Position.Z}");
 
             var id = new Id(Env);
             if (Env == "Stadium2020")

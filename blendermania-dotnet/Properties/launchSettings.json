@@ -1,11 +1,7 @@
 {
-  "profiles": {
-    "blendermania-dotnet": {
-      "commandName": "Project"
-    },
-    "get mt data": {
-      "commandName": "Project",
-      "commandLineArgs": "get-mediatracker-clips \"A:\\ManiaPlanet\\Docs\\Maps\\My Maps\\mt-test_1.Map.Gbx\""
+    "profiles": {
+        "blendermania-dotnet": {
+            "commandName": "Project"
+        }
     }
-  }
 }

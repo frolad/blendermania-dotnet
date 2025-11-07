@@ -1,5 +1,7 @@
+using System.Text.Json.Serialization;
 using GBX.NET;
 using GBX.NET.Engines.Game;
+using static GBX.NET.Engines.Game.CGameCtnAnchoredObject;
 
 namespace blendermania_dotnet
 {
@@ -11,17 +13,20 @@ namespace blendermania_dotnet
         public Vector3 Rotation { get; set; } = new Vector3();
         public Vector3 Pivot { get; set; } = new Vector3();
 
+        [JsonConverter(typeof(EPhaseOffsetConverter))]
+        public EPhaseOffset? AnimPhaseOffset { get; set; }
+
+        [JsonConverter(typeof(DifficultyColorConverter))]
+        public DifficultyColor? DifficultyColor { get; set; }
+
+        [JsonConverter(typeof(LightmapQualityConverter))]
+        public LightmapQuality? LightmapQuality { get; set; }
+
         public CGameCtnChallenge AddItemToMap(CGameCtnChallenge Map, string Env)
         {
             if (Path is null || Name is null)
             {
                 throw new Exception("Null Path or Name");
-            }
-
-            // embed only if it's not embedded already
-            if (Path.Length > 0 && (Map.EmbeddedData is null || !Map.EmbeddedData.ContainsKey(Name)))
-            {
-                Map.ImportFileToEmbed(Path, "Items");
             }
 
             if (Name.ToLower().StartsWith("items") || Name.ToLower().StartsWith("blocks"))
@@ -43,6 +48,11 @@ namespace blendermania_dotnet
                 Rotation.ToGBXNetVec3(),
                 Pivot.ToGBXNetVec3()
             );
+
+
+            item.AnimPhaseOffset = AnimPhaseOffset ?? EPhaseOffset.None;
+            item.Color = DifficultyColor ?? GBX.NET.DifficultyColor.Default;
+            item.LightmapQuality = LightmapQuality ?? GBX.NET.LightmapQuality.Normal;
 
             return Map;
         }

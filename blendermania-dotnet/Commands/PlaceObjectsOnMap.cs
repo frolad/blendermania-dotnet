@@ -1,92 +1,97 @@
 using GBX.NET;
 using GBX.NET.Engines.Game;
 
-namespace blendermania_dotnet
+namespace blendermania_dotnet;
+
+public class PlaceObjectsOnMap : BMMap, IBMCommand
 {
-    class PlaceObjectsOnMap
+    public const string COMMAND_NAME = "place-objects-on-map";
+    public bool ShouldOverwrite { get; set; } = false;
+    public string MapSuffix { get; set; } = "_modified";
+    public bool CleanBlocks { get; set; } = true;
+    public bool CleanItems { get; set; } = true;
+
+    public static async Task Execute(string payload)
     {
-        public string? MapPath { get; set; }
-        public List<Item> Items { get; set; } = new List<Item>();
-        public List<Block> Blocks { get; set; } = new List<Block>();
-        public bool ShouldOverwrite { get; set; } = false;
-        public string MapSuffix { get; set; } = "_modified";
-        public bool CleanBlocks { get; set; } = true;
-        public bool CleanItems { get; set; } = true;
-        public string Env { get; set; } = "Stadium";
+        var json = File.ReadAllText(payload);
+        var map = JsonSerializer.Deserialize<PlaceObjectsOnMap>(json, Constants.CommonJsonSerializerOptions) 
+            ?? throw new Exception("Invalid json");
 
-        async public Task Exec()
+        await map.Run();
+    }
+
+    async Task Run()
+    {
+        if (MapPath is null || MapPath.Length == 0)
         {
-            if (MapPath is null || MapPath.Length == 0)
-            {
-                throw new Exception("Map file path is null or empty");
-            }
-
-            // parse map
-            var map = Gbx.ParseNode<CGameCtnChallenge>(MapPath);
-
-            // clean up existed data
-            if (CleanBlocks) // DOESN'T WORK ATM IN GBX.NET
-            {
-                if (Blocks.Count > 0 && map.Blocks is not null)
-                {
-                    //map.Blocks.Clear();
-                }
-            }
-
-            if (CleanItems)
-            {
-                map.EmbeddedZipData = [];
-
-                if (map.AnchoredObjects is not null)
-                {
-                    map.AnchoredObjects.Clear();
-                }
-            }
-
-            // palce items
-            foreach (var item in Items)
-            {
-                map = item.AddItemToMap(map, Env);
-            }
-
-            // palce blocks
-            foreach (var block in Blocks) // VERY UNSTABLE
-            {
-                //map = block.AddBlockToMap(map);
-            }
-
-            // save modified map
-            var NewPath = MapPath;
-            if (!ShouldOverwrite)
-            {
-                if (MapSuffix.Trim().Count() == 0)
-                {
-                    MapSuffix = "_modified";
-                }
-
-                map.MapName += MapSuffix;
-
-                // change file name
-                var dir = Path.GetDirectoryName(NewPath);
-                var fn = Path.GetFileNameWithoutExtension(NewPath);
-                var ext = Path.GetExtension(NewPath);
-                if (fn.ToLower().Contains(".map"))
-                {
-                    fn = Path.GetFileNameWithoutExtension(fn) + MapSuffix + ".Map";
-                }
-                else
-                {
-                    fn = fn + MapSuffix;
-                }
-
-                if (dir is null)
-                {
-                    dir = "";
-                }
-                NewPath = Path.Combine(dir, fn + ext);
-            }
-
-            map.Save(NewPath);
+            throw new ArgumentNullException("Map file path is null or empty");
         }
+
+        // parse map
+        var map = Gbx.ParseNode<CGameCtnChallenge>(MapPath);
+
+        // clean up existed data
+        if (CleanBlocks) // DOESN'T WORK ATM IN GBX.NET
+        {
+            if (Blocks.Count > 0 && map.Blocks is not null)
+            {
+                //map.Blocks.Clear();
+            }
+        }
+
+        if (CleanItems)
+        {
+            map.EmbeddedZipData = [];
+
+            if (map.AnchoredObjects is not null)
+            {
+                map.AnchoredObjects.Clear();
+            }
+        }
+
+        // palce items
+        foreach (var item in Items)
+        {
+            map = item.AddItemToMap(map, Env);
+        }
+
+        // palce blocks
+        foreach (var block in Blocks) // VERY UNSTABLE
+        {
+            //map = block.AddBlockToMap(map);
+        }
+
+        // save modified map
+        var NewPath = MapPath;
+        if (!ShouldOverwrite)
+        {
+            if (MapSuffix.Trim().Count() == 0)
+            {
+                MapSuffix = "_modified";
+            }
+
+            map.MapName += MapSuffix;
+
+            // change file name
+            var dir = Path.GetDirectoryName(NewPath);
+            var fn = Path.GetFileNameWithoutExtension(NewPath);
+            var ext = Path.GetExtension(NewPath);
+            if (fn.ToLower().Contains(".map"))
+            {
+                fn = Path.GetFileNameWithoutExtension(fn) + MapSuffix + ".Map";
+            }
+            else
+            {
+                fn = fn + MapSuffix;
+            }
+
+            if (dir is null)
+            {
+                dir = "";
+            }
+            NewPath = Path.Combine(dir, fn + ext);
+        }
+
+        map.Save(NewPath);
     }
 }

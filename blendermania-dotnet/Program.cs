@@ -3,6 +3,7 @@ using GBX.NET.LZO;
 using GBX.NET.Engines.Game;
 using blendermania_dotnet;
 using System.Text.Json;
+using GBX.NET.Exceptions;
 
 // run to debug:
 // dotnet run -- <command> <payload>
@@ -30,86 +31,53 @@ using System.Text.Json;
 }
 */
 
-GBX.NET.Lzo.SetLzo(typeof(GBX.NET.LZO.MiniLZO));
-
-var command = args.ElementAtOrDefault(0);
-if (string.IsNullOrEmpty(command))
-{
-    throw new Exception("Command is not provided");
-}
-
-var payload = args.ElementAtOrDefault(1);
-if (string.IsNullOrEmpty(payload))
-{
-    throw new Exception("Payload path is not provided");
-}
-
-
-// move bellow to separate file?
-var options = new JsonSerializerOptions
-{
-    PropertyNameCaseInsensitive = true
-};
-
-
+// GBX.NET.Lzo.SetLzo(typeof(GBX.NET.LZO.MiniLZO));
 try
 {
 
+    var command = args.ElementAtOrDefault(0);
+    if (string.IsNullOrEmpty(command))
+    {
+        throw new Exception("Command is not provided");
+    }
+
+    var payload = args.ElementAtOrDefault(1);
+    if (string.IsNullOrEmpty(payload))
+    {
+        throw new Exception("Payload path is not provided");
+    }
+
+
+
+
     switch (command)
     {
-        case "place-objects-on-map":
-            {
-                var json = File.ReadAllText(payload);
-                var map = JsonSerializer.Deserialize<PlaceObjectsOnMap>(json, options);
-                if (map is null) { throw new Exception("Invalid json"); }
-                await map.Exec();
-                Console.Write($"SUCCESS");
-            }
-            break;
-
-        case "convert-item-to-obj":
-            {
-                var json = File.ReadAllText(payload);
-                var item = JsonSerializer.Deserialize<ConvertItemToObj>(json, options);
-                if (item is null) { throw new Exception("Invalid json"); }
-                var outputFile = item.Exec();
-                Console.Write($"SUCCESS: {outputFile}");
-            }
-            break;
-
-        case "place-mediatracker-clips-on-map":
-            {
-                var json = File.ReadAllText(payload);
-                var map = JsonSerializer.Deserialize<PlaceMediaTrackerClipOnMap>(json, options);
-                if (map is null) { throw new Exception("Invalid json"); }
-                await map.Exec();
-                Console.Write($"SUCCESS");
-            }
-            break;
-
-        case "get-mediatracker-clips":
-            var mtData = new MediaTrackerClipsData(MapPath: payload);
-            var jsonPath = mtData.WriteJsonFileGetPath();
-            Console.Write(jsonPath);
-            break;
-
-        case "replace-item-image":
-            {
-                var json = File.ReadAllText(payload);
-                var map = JsonSerializer.Deserialize<ReplaceItemImage>(json, options);
-                if (map is null) { throw new Exception("Invalid json"); }
-                await map.Exec();
-                Console.Write($"SUCCESS");
-            }
+        case PlaceObjectsOnMap.COMMAND_NAME:
+            await PlaceObjectsOnMap.Execute(payload);
             break;
 
         default:
             throw new Exception("No such command: " + command);
     }
-}
-catch (System.Exception err)
-{
-    Console.Write($"ERROR: {err.Message}");
 
-    //throw;
+    return (int)ExitCodes.Success;
+}
+
+
+catch (Exception err)
+{
+    Console.WriteLine("ERROR:");
+    Console.WriteLine(err.ToString());
+    
+    switch(err)
+    {
+        case NotAGbxException:
+            return (int)ExitCodes.NotAGbx;
+
+        case ArgumentNullException:
+            return (int)ExitCodes.ValueIsNull;
+
+        default:
+            return (int)ExitCodes.UnknownError;
+    }
 }

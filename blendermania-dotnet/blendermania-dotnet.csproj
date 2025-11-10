@@ -8,6 +8,8 @@
     <Nullable>enable</Nullable>
     <!-- <PublishTrimmed>true</PublishTrimmed> -->
     <Platforms>AnyCPU;x64</Platforms>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>
